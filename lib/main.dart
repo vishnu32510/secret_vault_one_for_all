@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:secretvaultoneforall/bloc_observer.dart';
 import 'package:secretvaultoneforall/core/config/global_keys.dart';
 import 'package:secretvaultoneforall/core/config/routes.dart';
@@ -12,6 +13,9 @@ import 'package:secretvaultoneforall/firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
   Bloc.observer = SimpleBlocObserver();
   setupDI();
   runApp(const SafepadApp());

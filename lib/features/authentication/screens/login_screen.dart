@@ -35,7 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthenticationBloc, AuthenticationBlocState>(
       listener: (context, state) {
         if (state.status == AuthenticationStatus.authenticated) {
-          Navigator.pop(context);
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
         }
       },
       child: BlocListener<LoginBloc, LoginState>(
