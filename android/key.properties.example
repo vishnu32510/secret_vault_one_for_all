@@ -1,0 +1,9 @@
+# Copy to android/key.properties and fill values for release signing.
+# Alias must match the one used when creating the keystore.
+# Suggested keytool identity for this app:
+#   CN=Vishnu Priyan Sellam Shanmugavel, OU=Engineering, O=Nungu, C=IN
+storePassword=keypassword
+keyPassword=keypassword
+keyAlias=upload
+# Path is relative to android/app/ (Gradle module), not android/.
+storeFile=../../keystore/upload-keystore.jks
