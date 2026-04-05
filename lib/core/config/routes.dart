@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+import 'package:secretvaultoneforall/features/authentication/screens/login_screen.dart';
+import 'package:secretvaultoneforall/features/home/screens/home_screen.dart';
+
+class AppRoutes {
+  static const String home = '/';
+  static const String login = '/login';
+}
+
+class CustomRouter {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case AppRoutes.login:
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
+      default:
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text('No route defined for ${settings.name}'),
+            ),
+          ),
+        );
+    }
+  }
+}

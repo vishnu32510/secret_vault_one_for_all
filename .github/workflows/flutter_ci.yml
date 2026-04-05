@@ -1,0 +1,140 @@
+name: Flutter CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Ensure firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: |
+          if [ -n "$FIREBASE_OPTIONS" ]; then
+            printf "%s" "$FIREBASE_OPTIONS" > lib/firebase_options.dart
+            dart format lib/firebase_options.dart
+          elif [ -f lib/firebase_options.dart ]; then
+            echo "Using committed lib/firebase_options.dart"
+          else
+            echo "Missing lib/firebase_options.dart and FIREBASE_OPTIONS secret" >&2
+            exit 1
+          fi
+
+      - name: Ensure Android google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_B64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > android/app/google-services.json
+          elif [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf "%s" "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          elif [ -f android/app/google-services.json ]; then
+            echo "Using committed android/app/google-services.json"
+          else
+            echo "Missing android/app/google-services.json and GOOGLE_SERVICES_JSON_B64/GOOGLE_SERVICES_JSON secret" >&2
+            exit 1
+          fi
+
+      - name: Ensure iOS GoogleService-Info.plist
+        env:
+          IOS_GOOGLE_SERVICE_INFO_PLIST_B64: ${{ secrets.IOS_GOOGLE_SERVICE_INFO_PLIST_B64 }}
+        run: |
+          if [ -n "$IOS_GOOGLE_SERVICE_INFO_PLIST_B64" ]; then
+            echo "$IOS_GOOGLE_SERVICE_INFO_PLIST_B64" | base64 -d > ios/Runner/GoogleService-Info.plist
+          elif [ -f ios/Runner/GoogleService-Info.plist ]; then
+            echo "Using committed ios/Runner/GoogleService-Info.plist"
+          else
+            echo "Missing ios/Runner/GoogleService-Info.plist and IOS_GOOGLE_SERVICE_INFO_PLIST_B64 secret" >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Run static analysis
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+  android_debug_apk:
+    name: Build Android Debug APK (main)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Ensure firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: |
+          if [ -n "$FIREBASE_OPTIONS" ]; then
+            printf "%s" "$FIREBASE_OPTIONS" > lib/firebase_options.dart
+            dart format lib/firebase_options.dart
+          elif [ -f lib/firebase_options.dart ]; then
+            echo "Using committed lib/firebase_options.dart"
+          else
+            echo "Missing lib/firebase_options.dart and FIREBASE_OPTIONS secret" >&2
+            exit 1
+          fi
+
+      - name: Ensure Android google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_B64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_B64" | base64 -d > android/app/google-services.json
+          elif [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf "%s" "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          elif [ -f android/app/google-services.json ]; then
+            echo "Using committed android/app/google-services.json"
+          else
+            echo "Missing android/app/google-services.json and GOOGLE_SERVICES_JSON_B64/GOOGLE_SERVICES_JSON secret" >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Upload debug APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error

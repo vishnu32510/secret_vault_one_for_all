@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "561878597833",
+    "project_id": "secret-vault-one-for-all",
+    "storage_bucket": "secret-vault-one-for-all.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561878597833:android:d1139e8b83222985638d18",
+        "android_client_info": {
+          "package_name": "com.nungu.secretvaultoneforall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbr_6nfl2N2YKxcB3J-GbYxA8VagbCy0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

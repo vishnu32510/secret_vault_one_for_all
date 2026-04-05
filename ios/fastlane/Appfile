@@ -1,0 +1,6 @@
+# App Store Connect app identifier (matches Xcode Runner target).
+app_identifier("com.nungu.secretvaultoneforall")
+
+# Apple Developer Team ID (from Xcode -> Signing & Capabilities).
+# Override in CI/local shell with APP_TEAM_ID if you prefer not committing a fixed value.
+team_id(ENV.fetch("APP_TEAM_ID", "YOUR_TEAM_ID"))

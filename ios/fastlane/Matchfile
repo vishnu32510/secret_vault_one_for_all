@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+_u = ENV["MATCH_GIT_URL"]&.strip
+git_url((_u && !_u.empty?) ? _u : "https://github.com/YOUR_ORG/ios-certificates.git")
+
+git_branch(ENV["MATCH_GIT_BRANCH"].to_s.empty? ? "main" : ENV["MATCH_GIT_BRANCH"])
+
+storage_mode("git")
+
+app_identifier(["com.nungu.secretvaultoneforall"])
+team_id(ENV.fetch("APP_TEAM_ID", "YOUR_TEAM_ID"))
