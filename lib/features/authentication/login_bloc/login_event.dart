@@ -63,11 +63,3 @@ final class ContinueWithEmailAndPassword extends LoginEvent {
   @override
   List<Object> get props => [email, password];
 }
-
-final class LoginWithGoogle extends LoginEvent {
-  const LoginWithGoogle();
-}
-
-final class LoginWithApple extends LoginEvent {
-  const LoginWithApple();
-}

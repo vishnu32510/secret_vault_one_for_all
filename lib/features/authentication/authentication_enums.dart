@@ -1,5 +1,5 @@
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 
-enum LoginMethod { google, apple, email }
+enum LoginMethod { email }
 
 enum FormzSubmissionStatus { initial, failure, success, inProgress }

@@ -7,10 +7,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Safepad'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Safepad'), centerTitle: true),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -27,9 +24,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'Private notes on every platform.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
             ],

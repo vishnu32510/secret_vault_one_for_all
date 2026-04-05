@@ -6,9 +6,6 @@ class LoginBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
-      height: 680,
-      child: LoginScreen(),
-    );
+    return const SizedBox(height: 680, child: LoginScreen());
   }
 }

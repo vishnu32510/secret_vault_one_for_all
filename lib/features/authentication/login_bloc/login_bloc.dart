@@ -17,8 +17,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginWithEmailAndPassword>(_onLoginWithEmail);
     on<SignUpWithEmailAndPassword>(_onSignUpWithEmail);
     on<ContinueWithEmailAndPassword>(_onContinueWithEmail);
-    on<LoginWithGoogle>(_onLoginWithGoogle);
-    on<LoginWithApple>(_onLoginWithApple);
   }
 
   final FirebaseAuthenticationRepository _authenticationRepository;
@@ -115,46 +113,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           ),
         );
       }
-    } catch (_) {
-      emit(state.copyWith(status: FormzSubmissionStatus.failure));
-    }
-  }
-
-  Future<void> _onLoginWithGoogle(
-    LoginWithGoogle event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-    try {
-      await _authenticationRepository.logInWithGoogle();
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } on LogInWithGoogleFailure catch (e) {
-      emit(
-        state.copyWith(
-          errorMessage: e.message,
-          status: FormzSubmissionStatus.failure,
-        ),
-      );
-    } catch (_) {
-      emit(state.copyWith(status: FormzSubmissionStatus.failure));
-    }
-  }
-
-  Future<void> _onLoginWithApple(
-    LoginWithApple event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-    try {
-      await _authenticationRepository.logInWithApple();
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } on LogInWithGoogleFailure catch (e) {
-      emit(
-        state.copyWith(
-          errorMessage: e.message,
-          status: FormzSubmissionStatus.failure,
-        ),
-      );
     } catch (_) {
       emit(state.copyWith(status: FormzSubmissionStatus.failure));
     }

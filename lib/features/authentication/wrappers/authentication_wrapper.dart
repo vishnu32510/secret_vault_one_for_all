@@ -34,9 +34,8 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
             ),
           ),
           BlocProvider(
-            create: (_) => LoginBloc(
-              authenticationRepository: _authenticationRepository,
-            ),
+            create: (_) =>
+                LoginBloc(authenticationRepository: _authenticationRepository),
           ),
         ],
         child: widget.child,

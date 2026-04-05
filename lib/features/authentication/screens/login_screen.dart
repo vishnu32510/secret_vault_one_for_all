@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:secretvaultoneforall/core/di/injection.dart';
@@ -49,9 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         },
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Sign In'),
-          ),
+          appBar: AppBar(title: const Text('Sign In')),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -68,24 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   _buildEmailForm(context),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: cs.outlineVariant)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'OR',
-                          style: textTheme.labelMedium?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: cs.outlineVariant)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _buildSocialButtons(context),
                 ],
               ),
             ),
@@ -112,9 +89,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
-                validator: (v) =>
-                    (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
-                onChanged: (v) => context.read<LoginBloc>().add(LoginEmailChanged(v)),
+                validator: (v) => (v == null || !v.contains('@'))
+                    ? 'Enter a valid email'
+                    : null,
+                onChanged: (v) =>
+                    context.read<LoginBloc>().add(LoginEmailChanged(v)),
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -145,15 +124,19 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: isLoading ? null : () => _handleEmailContinue(context),
+                  onPressed: isLoading
+                      ? null
+                      : () => _handleEmailContinue(context),
                   child: isLoading
                       ? const SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text('Continue with Email',
-                          style: TextStyle(color: cs.onPrimary)),
+                      : Text(
+                          'Continue with Email',
+                          style: TextStyle(color: cs.onPrimary),
+                        ),
                 ),
               ),
             ],
@@ -163,63 +146,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialButtons(BuildContext context) {
-    final showApple = !kIsWeb && (Platform.isIOS || Platform.isMacOS);
-    return Column(
-      children: [
-        _SocialButton(
-          icon: Icons.g_mobiledata,
-          iconColor: Colors.red,
-          label: 'Continue with Google',
-          onTap: () => context.read<LoginBloc>().add(const LoginWithGoogle()),
-        ),
-        if (showApple) ...[
-          const SizedBox(height: 12),
-          _SocialButton(
-            icon: Icons.apple,
-            iconColor: Theme.of(context).colorScheme.onSurface,
-            label: 'Continue with Apple',
-            onTap: () => context.read<LoginBloc>().add(const LoginWithApple()),
-          ),
-        ],
-      ],
-    );
-  }
-
   void _handleEmailContinue(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<LoginBloc>().add(
-            ContinueWithEmailAndPassword(
-              email: _emailCtrl.text.trim(),
-              password: _passwordCtrl.text.trim(),
-            ),
-          );
+        ContinueWithEmailAndPassword(
+          email: _emailCtrl.text.trim(),
+          password: _passwordCtrl.text.trim(),
+        ),
+      );
     }
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, color: iconColor),
-        label: Text(label),
-      ),
-    );
   }
 }

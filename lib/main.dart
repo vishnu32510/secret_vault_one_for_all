@@ -11,9 +11,7 @@ import 'package:secretvaultoneforall/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Bloc.observer = SimpleBlocObserver();
   setupDI();
   runApp(const SafepadApp());
@@ -26,9 +24,7 @@ class SafepadApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return AuthenticationWrapper(
       child: MultiBlocProvider(
-        providers: [
-          BlocProvider<ThemeBloc>(create: (_) => getIt<ThemeBloc>()),
-        ],
+        providers: [BlocProvider<ThemeBloc>(create: (_) => getIt<ThemeBloc>())],
         child: BlocBuilder<ThemeBloc, ThemeState>(
           builder: (context, themeState) {
             return MaterialApp(

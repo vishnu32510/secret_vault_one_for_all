@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'cache.dart';
 import 'user.dart';
@@ -15,14 +12,11 @@ class FirebaseAuthenticationRepository extends AuthenticationRepository {
   FirebaseAuthenticationRepository({
     CacheClient? cache,
     firebase_auth.FirebaseAuth? firebaseAuth,
-    GoogleSignIn? googleSignIn,
-  })  : _cache = cache ?? CacheClient(),
-        _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+  }) : _cache = cache ?? CacheClient(),
+       _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance;
 
   final CacheClient _cache;
   final firebase_auth.FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
 
   static const userCacheKey = '__user_cache_key__';
 
@@ -72,61 +66,9 @@ class FirebaseAuthenticationRepository extends AuthenticationRepository {
     }
   }
 
-  Future<void> logInWithGoogle() async {
-    try {
-      late final firebase_auth.AuthCredential credential;
-      if (kIsWeb) {
-        final provider = firebase_auth.OAuthProvider('google.com');
-        final userCredential = await _firebaseAuth.signInWithPopup(provider);
-        credential = userCredential.credential!;
-      } else {
-        final googleUser = await _googleSignIn.signIn();
-        final googleAuth = await googleUser!.authentication;
-        credential = firebase_auth.OAuthProvider('google.com').credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-      }
-      await _firebaseAuth.signInWithCredential(credential);
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithGoogleFailure.fromCode(e.code, messageString: e.message);
-    } catch (e) {
-      debugPrint(e.toString());
-      throw const LogInWithGoogleFailure();
-    }
-  }
-
-  Future<void> logInWithApple() async {
-    try {
-      late final firebase_auth.AuthCredential credential;
-      if (kIsWeb) {
-        final provider = firebase_auth.OAuthProvider('apple.com');
-        final userCredential = await _firebaseAuth.signInWithPopup(provider);
-        credential = userCredential.credential!;
-      } else {
-        final appleCredential = await SignInWithApple.getAppleIDCredential(
-          scopes: [
-            AppleIDAuthorizationScopes.email,
-            AppleIDAuthorizationScopes.fullName,
-          ],
-        );
-        credential = firebase_auth.OAuthProvider('apple.com').credential(
-          idToken: appleCredential.identityToken,
-          accessToken: appleCredential.authorizationCode,
-        );
-      }
-      await _firebaseAuth.signInWithCredential(credential);
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      throw LogInWithGoogleFailure.fromCode(e.code, messageString: e.message);
-    } catch (e) {
-      debugPrint(e.toString());
-      throw const LogInWithGoogleFailure();
-    }
-  }
-
   Future<void> logOut() async {
     try {
-      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
+      await _firebaseAuth.signOut();
     } catch (_) {
       throw const LogOutFailure();
     }
@@ -138,7 +80,10 @@ class FirebaseAuthenticationRepository extends AuthenticationRepository {
       throw const DeleteAccountFailure('No signed-in user found.');
     }
     try {
-      await FirebaseFirestore.instance.collection('users').doc(current.uid).delete();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(current.uid)
+          .delete();
     } catch (_) {
       // ignore if doc missing
     }
@@ -223,25 +168,6 @@ class LogInWithEmailAndPasswordFailure implements Exception {
         );
       default:
         return LogInWithEmailAndPasswordFailure(
-          messageString ?? 'An unknown error occurred.',
-        );
-    }
-  }
-
-  final String message;
-}
-
-class LogInWithGoogleFailure implements Exception {
-  const LogInWithGoogleFailure([this.message = 'An unknown error occurred.']);
-
-  factory LogInWithGoogleFailure.fromCode(String code, {String? messageString}) {
-    switch (code) {
-      case 'account-exists-with-different-credential':
-        return const LogInWithGoogleFailure(
-          'Account exists with different credentials.',
-        );
-      default:
-        return LogInWithGoogleFailure(
           messageString ?? 'An unknown error occurred.',
         );
     }
